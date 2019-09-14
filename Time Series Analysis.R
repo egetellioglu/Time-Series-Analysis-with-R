@@ -177,8 +177,206 @@ matplot(Year2, cbind(Apple.returns, q005.t*sigma.taparch11, q001.t*sigma.taparch
 title("Apple loss (black) with 5%- & 1% VaR (red/green) for APARCh(1,1)-t")
 
 
+# Exercise 3 
+
+# Find some daily nancial time series within the period between 
+# January 2004 and May 2018 with a clear eect of the nancial crisis in 2008 and 2009.
+
+par(mfrow=c(2,1))
+Z=read.csv("BCS.csv")
+Price=Z[,5]
+nd=length(Price)
+
+Year=(1:nd)/nd*(14+5/12)+2004
+plot(Year, Price, type="l")
+title("Daily time series of Barclays stock prices (2004 - May 2018)")
+abline(v=2008, col=2)
+abline(v=2010, col=2)
 
 
+
+# Plot the returns of Barclays stock prices (2004 - May 2018)
+
+BCS.Returns=diff(log(Price)) ###### calculate the log returns
+n2=length(BCS.Returns)
+Year2=(1:n2)/n2*(5/12+14)+2004
+plot(Year2, BCS.Returns, type="l", col=1, xlab="Year", main="Barclays returns")
+abline(v=2011, col=2)
+
+
+
+# Calculate and compare the (unconditional) standard deviations of the returns
+# for the four sub-periods 2004 to 2007, 2008 to 2009, 2010 to 2012 and 2013 to
+# May 2018, respectively
+
+BCS1=Price[2:756]       ###### data from 2004 to 2007
+BCS2=Price[757:1260]    ###### data from 2008 to 2009
+BCS3=Price[1261:2266]   ###### data from 2010 to 2012
+BCS4=Price[2267:3627]   ###### data from 2013 to May 2018
+n11=length(BCS1)
+n22=length(BCS2)
+n33=length(BCS3)
+n44=length(BCS4)
+return1=diff(log(BCS1))
+return2=diff(log(BCS2))
+return3=diff(log(BCS3))
+return4=diff(log(BCS4))
+sd1=sqrt(sum((return1-mean(return1))^2)/(n11-1))       ##### number n-1
+sd2=sqrt(sum((return2-mean(return2))^2)/(n22-1))
+sd3=sqrt(sum((return3-mean(return3))^2)/(n33-1))
+sd4=sqrt(sum((return4-mean(return4))^2)/(n44-1))
+
+sd1
+sd2
+sd3
+sd4
+
+
+# Exercise 4
+
+# High-frequency data, realized volatility and realized correlations
+# Data les under the names \W4451-UHFA1.txt", \W4451-UHFA2.txt", \W4451-UHFA3.txt";
+# \W4451-EHFA1.txt", \W4451-EHFA2.txt", \W4451-EHFA3.txt" and \W4451-EHFS1.txt",
+# \W4451-EHFS2.txt" and \W4451-EHFS3.txt" are provided on Moodle. Where the rst three
+# data les consist of the ultra-high-frequency stock prices of the Allianz AG in two weeks in
+# Jaunuary 2006, January 2009 and January 2012, respectively, i.e. in three periods before,
+# during and after the 2008 nancial crisis. The next three data les consist of the 1-minute-
+# prices treated from the rst three les. Corresponding 1-minute-prices of the Siemens AG are
+# given in the last three data les. Each of these les consists of three columns with a title line:
+# Day, Time and Price, where the variable \Time" in the rst three les is given in decimal
+# format and the variable \Time" in the last six les is given in the format \hour:minute". A code
+# \W4451-2018-Proj-Q4.txt" is also provided.
+
+num=6811992  ####### your own Matrikelnummer
+
+X1=read.table("W4451-EHFA1.txt",header=TRUE)
+X2=read.table("W4451-EHFA2.txt",header=TRUE)
+X3=read.table("W4451-EHFA3.txt",header=TRUE)
+d1=as.numeric(substring(num,5,5))+1
+d2=as.numeric(substring(num,6,6))+1
+d3=as.numeric(substring(num,7,7))+1
+XEHFA1=X1[X1$Day == (sort(unique(X1$Day))[d1]), ]
+XEHFA2=X2[X2$Day == (sort(unique(X2$Day))[d2]), ]
+XEHFA3=X3[X3$Day == (sort(unique(X3$Day))[d3]), ]
+
+Y1=read.table("W4451-EHFS1.txt",header=TRUE)
+Y2=read.table("W4451-EHFS2.txt",header=TRUE)
+Y3=read.table("W4451-EHFS3.txt",header=TRUE)
+XEHFS1=Y1[Y1$Day == (sort(unique(Y1$Day))[d1]), ]
+XEHFS2=Y2[Y2$Day == (sort(unique(Y2$Day))[d2]), ]
+XEHFS3=Y3[Y3$Day == (sort(unique(Y3$Day))[d3]), ]
+
+Z1=read.table("W4451-UHFA1.txt",header=TRUE)
+Z2=read.table("W4451-UHFA2.txt",header=TRUE)
+Z3=read.table("W4451-UHFA3.txt",header=TRUE)
+XUHFA1=Z1[Z1$Day == (sort(unique(Z1$Day))[d1]), ]
+XUHFA2=Z2[Z2$Day == (sort(unique(Z2$Day))[d2]), ]
+XUHFA3=Z3[Z3$Day == (sort(unique(Z3$Day))[d3]), ]
+
+
+
+# #Display the three ultra-high-frequency price series of Allianz AG against the corresponding
+# observation time points
+
+X1=read.table("W4451-UHFA1.txt", header=TRUE)
+X2=read.table("W4451-UHFA2.txt", header=TRUE)
+X3=read.table("W4451-UHFA3.txt", header=TRUE)
+p1=X1[,3]
+p2=X2[,3]
+p3=X3[,3]
+par(mfrow=c(3,1),mai=c(0.5,0.6,0.5,0.4))
+plot.ts(p1, type="l", col=2, ylab="Price")
+title("Ultra-high frequency stock price of Allianz AG, 12 Jan.2006")
+plot.ts(p2, type="l", col=2, ylab="Price")
+title("Ultra-high frequency stock price of Allianz AG, 13 Jan.2009")
+plot.ts(p3, type="l", col=2, ylab="Price")
+title("Ultra-high frequency stock price of Allianz AG, 12 Jan.2012")
+
+p1.log=log(p1)
+p2.log=log(p2)
+p3.log=log(p3)
+returns.p1=diff(p1.log)
+returns.p2=diff(p2.log)
+returns.p3=diff(p3.log)
+par(mfrow=c(3,1),mai=c(0.5,0.6,0.5,0.4))
+plot.ts(returns.p1, type="l", col=2, ylab="Price")
+title("Return Series of Allianz AG stock price, 12 Jan.2006")
+plot.ts(returns.p2, type="l", col=2, ylab="Price")
+title("Return Series of Allianz AG stock price, 13 Jan.2009")
+plot.ts(returns.p3, type="l", col=2, ylab="Price")
+title("Return Series of Allianz AG stock price, 12 Jan.2012")
+
+# Calculate and state the realized volatility (RV) on the three days.
+
+xpa1=XEHFA1[,3]
+xpa2=XEHFA2[,3]
+xpa3=XEHFA3[,3]
+returns.xpa1=diff(log(xpa1))
+returns.xpa2=diff(log(xpa2))
+returns.xpa3=diff(log(xpa3))
+rv.xpa1=sum(returns.xpa1**2)
+rv.xpa2=sum(returns.xpa2**2)
+rv.xpa3=sum(returns.xpa3**2)
+rv.xpa1
+rv.xpa2
+rv.xpa3
+
+xps1=XEHFS1[,3]
+xps2=XEHFS2[,3]
+xps3=XEHFS3[,3]
+returns.xps1=diff(log(xps1))
+returns.xps2=diff(log(xps2))
+returns.xps3=diff(log(xps3))
+rv.xps1=sum(returns.xps1**2)
+rv.xps2=sum(returns.xps2**2)
+rv.xps3=sum(returns.xps3**2)
+rv.xps1
+rv.xps2
+rv.xps3
+
+xupa1=XUHFA1[,3]
+xupa2=XUHFA2[,3]
+xupa3=XUHFA3[,3]
+returns.xupa1=diff(log(xupa1))
+returns.xupa2=diff(log(xupa2))
+returns.xupa3=diff(log(xupa3))
+rv.xupa1=sum(returns.xupa1**2)
+rv.xupa2=sum(returns.xupa2**2)
+rv.xupa3=sum(returns.xupa3**2)
+rv.xupa1
+rv.xupa2
+rv.xupa3
+
+# Calculate the equidistant returns on the three days for both companies.
+
+returns.xpa1
+returns.xpa2
+returns.xpa3
+returns.xps1
+returns.xps2
+returns.xps3
+par(mfrow=c(3,1),mai=c(0.5,0.6,0.5,0.4))
+plot(returns.xpa1, returns.xps1, xlab="Equidistant Returns of Allianz AG", ylab="Equidistant Returns of Siemens")
+plot(returns.xpa2, returns.xps2, xlab="Equidistant Returns of Allianz AG", ylab="Equidistant Returns of Siemens")
+plot(returns.xpa3, returns.xps3, xlab="Equidistant Returns of Allianz AG", ylab="Equidistant Returns of Siemens")
+ 
+# Calculate and state the realized correlations (RCor) on those days.
+ 
+rcov1=sum(returns.xpa1*returns.xps1)
+rcov2=sum(returns.xpa2*returns.xps2)
+rcov3=sum(returns.xpa3*returns.xps3)
+rva1=sum(returns.xpa1**2)
+rvs1=sum(returns.xps1**2)
+rva2=sum(returns.xpa2**2)
+rvs2=sum(returns.xps2**2)
+rva3=sum(returns.xpa3**2)
+rvs3=sum(returns.xps3**2)
+rcor1=rcov1/(sqrt(rva1)*sqrt(rvs1))
+rcor2=rcov2/(sqrt(rva2)*sqrt(rvs2))
+rcor3=rcov3/(sqrt(rva3)*sqrt(rvs3))
+rcor1
+rcor2
+rcor3
 
 
 
