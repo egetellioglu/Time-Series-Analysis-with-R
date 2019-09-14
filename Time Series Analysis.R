@@ -1,5 +1,4 @@
-
-rm(list = ls())
+#### FINANCIAL TIME SERTIES ANALYSIS ####
 
 setwd("C:\\Users\\user\\Documents\\Time-Series-Analysis-with-R")
 getwd()
